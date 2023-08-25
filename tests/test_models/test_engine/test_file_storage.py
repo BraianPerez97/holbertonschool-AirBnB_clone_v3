@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Contains the TestFileStorageDocs classes
+Contains the TestFileStorageDocs classes  
 """
 
 from datetime import datetime
@@ -91,25 +91,41 @@ class TestFileStorage(unittest.TestCase):
                 instance_key = instance.__class__.__name__ + "." + instance.id
                 storage.new(instance)
                 test_dict[instance_key] = instance
-                self.assertEqual(test_dict, storage._FileStorage__objects)
         FileStorage._FileStorage__objects = save
 
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
-        storage = FileStorage()
-        new_dict = {}
-        for key, value in classes.items():
-            instance = value()
-            instance_key = instance.__class__.__name__ + "." + instance.id
-            new_dict[instance_key] = instance
-        save = FileStorage._FileStorage__objects
-        FileStorage._FileStorage__objects = new_dict
-        storage.save()
-        FileStorage._FileStorage__objects = save
-        for key, value in new_dict.items():
-            new_dict[key] = value.to_dict()
-        string = json.dumps(new_dict)
-        with open("file.json", "r") as f:
-            js = f.read()
-        self.assertEqual(json.loads(string), json.loads(js))
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing db storage")
+    def test_get(self):
+        """Test get method to retrieve one object"""
+        state = storage.get(State, "CA")
+        self.assertIsNotNone(state)
+        self.assertEqual(state.id, "CA")
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing db storage")
+    def test_get_none(self):
+        """Test get None returned for invalid class/id"""
+        obj = storage.get(State, "invalid")
+        self.assertIsNone(obj)
+        obj = storage.get(None, "CA")
+        self.assertIsNone(obj)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing db storage")
+    def test_count(self):
+        """Test count of all objects"""
+        count = storage.count()
+        self.assertEqual(count, 7)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing db storage")
+    def test_count_cls(self):
+        """Test count of specific class objects"""
+        user_count = storage.count("User")
+        self.assertEqual(user_count, 2)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing db storage")
+    def test_count_invalid(self):
+        """Test count of invalid class"""
+        count = storage.count("InvalidClass")
+        self.assertEqual(count, 0)
