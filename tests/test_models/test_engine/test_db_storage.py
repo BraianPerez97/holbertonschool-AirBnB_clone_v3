@@ -14,6 +14,7 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
+from models.engine.db_storage import DBStorage
 import json
 import os
 import pep8
@@ -86,3 +87,31 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+    @unittest.skipIf(models.storage_t != 'db', "not testeing db storage")
+    def test_get(self):
+        """Test that get returns an object based on class and id"""
+        obj = storage.get(State, "1234-abcd")
+        self.assertIsNotNone(obj)
+        self.assertEqual(obj.id, "1234-abcd")
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_none(self):
+        """Test that get returns None if invalix class or id"""
+        obj = storage.get(State, "5678-efgh")
+        self.assertIsNone(obj)
+        obj = storage.get(None, "1234-abcd")
+        self.assertIsNone(obj)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count(self):
+        """Test that count returns correct count"""
+        all_count = storage()
+        self.assertEqual(all_count, 36)
+        state_count = storage.count(State)
+        self.assertEqual(state_count, 4)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_invalid(self):
+        """Test count with invalid class"""
+        invalid_count = storage.count(None)
+        self.assertEqual(invalid_count, 0)
