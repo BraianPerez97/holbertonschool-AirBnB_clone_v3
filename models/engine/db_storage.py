@@ -15,7 +15,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 classes = {"Amenity": Amenity, "City": City,
-           "Place": Place, "Review": Review, "State": State, "User": User}
+           "Place": Place, "Review": Review,
+           "State": State, "User": User}
 
 
 class DBStorage:
@@ -50,7 +51,7 @@ class DBStorage:
         return (new_dict)
 
     def get(self, cls, id):
-        """retrieves an object of a class with id"""
+        """retrieves an object of class with id"""
         obj = None
         if cls is not None and issubclass(cls, BaseModel):
             obj = self.__session.query(cls).filter(cls.id == id).first()
