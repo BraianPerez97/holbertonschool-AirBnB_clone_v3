@@ -62,7 +62,7 @@ def put_user(user_id):
         abort(400, "Not a JSON")
 
     for k, v in req.items():
-        if k not in ['id', 'email', 'created_at', 'updated_at']:
+        if k not in ['id', 'email', 'created_at', 'update_at']:  # Corrected 'updated_at' to 'update_at'
             setattr(obj, k, v)
 
     storage.save()
